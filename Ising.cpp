@@ -6,7 +6,7 @@
 
 using namespace std;
 const int L=40; // Tamaño de la red
-const int n=79; // Número de temperaturas
+const int n=40; // Número de temperaturas
 const int M0=1000; // Número de pasos de termalización
 const int M = 8192; // Número de pasos de medida por temperatura
 
@@ -156,6 +156,7 @@ int main()
 
     double J = 1; // Interacción entre espines
     double H = 0; // Campo magnético externo
+    double rm = 0, rm2 = 0, rm0 = 0, rm1 = 0, c = 0;
 
 
 
@@ -169,52 +170,62 @@ int main()
     double varianzas_magnetizacion[n];
     double susceptibilidades[n];
     generar_datos(s, L);
+    
     for (int j = 0; j < n; j++) {
         double T = T_f - j * (T_f - T_i) / (n-1); // Temperatura decreciente
         double h[5][2];
         precalcular_factores(h, J, H, T); // Precalcular factores de Boltzmann-Gibbs
         temperaturas[j] = T;
         string direccion = "resultados/H=" + format_double(H) + "/ising_data_L_" + to_string(L) + "_T_" + format_double(T) + ".dat";
-        crear_fichero(direccion);
+        // crear_fichero(direccion);
 
 
         cout << "Procesando temperatura " << j + 1 << " de " << n << " (T = " << T << ")" << endl;
 
         double magnetizaciones[M]; // Arreglo para almacenar las magnetizaciones finales
-        escribir_datos(s, L, direccion);
+        // escribir_datos(s, L, direccion);
         // Termalización
         for (int i = 0; i < M0 * L * L; i++) {
             ising(s, T, L, J, H, h);
             if (i % (L * L) == 0) {
-                escribir_datos(s, L, direccion); // Escribir cada L^2 pasos
+                // escribir_datos(s, L, direccion); // Escribir cada L^2 pasos
             }
         }
         // Medición
+        rm=0;
+        rm2=0;
+        c=0;
         for (int i = 0; i < M; i++) {
             for(int j = 0; j < L * L; j++) {
                 ising(s, T, L, J, H, h); // Actualizar el sistema
             }
-            magnetizaciones[i] = magnetizacion(s, L); // Calcular la magnetización
+            rm0 = magnetizacion(s, L); // Magnetización instantánea
+            rm1 = magnetizacion(s, L);
+            rm += rm0;
+            rm2 += rm0 * rm0;
+            c += rm0 * rm1; // Correlación con el paso anterior
+            rm1 = rm0;
+
             salida_energia << energia_total(s, L, J, H) << "\n"; // Escribir la energía en el archivo
-            escribir_datos(s, L, direccion); // Escribir cada paso de medida
+            // escribir_datos(s, L, direccion); // Escribir cada paso de medida
         }
 
-        // Calcular la media y la varianza de la magnetización
-        double suma = 0, suma_cuadrados = 0;
-        for (int sim = 0; sim < M; sim++) {
-            suma += magnetizaciones[sim];
-            suma_cuadrados += magnetizaciones[sim] * magnetizaciones[sim];
+        rm /= M;
+        rm2 /= M;
+        c = (c / M - rm * rm) / rm2;
+
+        double tau = 0.0;
+        if (c != 1.0) {
+            tau = c / (1.0 - c); // Tiempo de autocorrelación
         }
-        double media = suma / M;
-        double varianza = (suma_cuadrados / M) - (media * media);
 
-        medias_magnetizacion[j] = media;
-        varianzas_magnetizacion[j] = varianza;
+        double error = sqrt(rm2 * (2.0 * tau + 1.0) / M);
 
-        // Calcular la susceptibilidad magnética
-        susceptibilidades[j] = susceptibilidad_magnetica(magnetizaciones, M, T);
+        medias_magnetizacion[j] = rm;
+        varianzas_magnetizacion[j] = error; // Guardamos el error, no la varianza
+        susceptibilidades[j] = L*L*(rm2-rm*rm) / T;
 
-        cout << "  Temperatura " << T << " completada. Media magnetización: " << media << ", Varianza: " << varianza << endl;
+        cout << "  Temperatura " << T << " completada. Media magnetización: " << medias_magnetizacion[j] << ", error: " << error << endl;
     }
 
     // Escribir resultados en los archivos
