@@ -5,7 +5,7 @@
 # include <math.h>
 
 using namespace std;
-const int L=50; // Tamaño de la red
+const int L=40; // Tamaño de la red
 const int n=7; // Número de temperaturas
 const int M0=1000; // Número de pasos de termalización
 const int M = 8192; // Número de pasos de medida por temperatura

@@ -45,8 +45,8 @@ import io
 
 # Parámetros
 # ========================================
-T = 1.5 # Temperatura del sistema
-L = 50 # Tamaño del retículo (LxL)
+T = 4 # Temperatura del sistema
+L = 100 # Tamaño del retículo (LxL)
 file_in = "resultados/Kawasaki/ising_data_L_" + str(L) + "_T_" + str(T) + ".dat" # Nombre del fichero de datos
 file_out = "resultados/Kawasaki/ising_L_" + str(L) + "_T_" + str(T) # Nombre del fichero de salida (sin extensión)
 interval = 20 # Tiempo entre fotogramas en milisegundos

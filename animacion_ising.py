@@ -45,8 +45,8 @@ import io
 
 # Parámetros
 # ========================================
-T = 4 # Temperatura del sistema
-L = 40 # Tamaño del retículo (LxL)
+T = 1 # Temperatura del sistema
+L = 100 # Tamaño del retículo (LxL)
 file_in = "resultados/H=0/ising_data_L_" + str(L) + "_T_" + str(T) + ".dat" # Nombre del fichero de datos
 file_out = "resultados/H=0/ising_L_" + str(L) + "_T_" + str(T) # Nombre del fichero de salida (sin extensión)
 interval = 20 # Tiempo entre fotogramas en milisegundos
@@ -94,7 +94,7 @@ def update(j_frame, frames_data, im):
     im.set_data(frames_data[j_frame])
     
     # Actualiza el título con los valores de L y T
-    ax.set_title(f"L = {L}, T = {T}", fontsize=12)
+    ax.set_title(f"L = {L}, T = {T}", fontsize=16)
 
     return im,
 
