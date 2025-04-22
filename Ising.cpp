@@ -5,10 +5,10 @@
 # include <cmath>
 
 using namespace std;
-const int L=40; // Tamaño de la red
-const int n=60; // Número de temperaturas
-const int M0=1000; // Número de pasos de termalización
-const int M = 50000; // Número de pasos de medida por temperatura
+const int L=160; // Tamaño de la red
+const int n=31; // Número de temperaturas
+const int M0=1; // Número de pasos de termalización
+const int M = 100000; // Número de pasos de medida por temperatura
 
 // Inicializar el generador de números aleatorios
 void inicializar_aleatorio() {
@@ -66,6 +66,10 @@ void ising(int s[L][L], int N, double h[5][2]) {
     double p = h[idx][idy];
     double e = rand() / (double)RAND_MAX; // Generar probabilidad aleatoria
 
+    if (1 < p) {
+        p = 1; // Limitar la probabilidad a 1
+    }
+
     if (e < p) {
         s[n][m] = -s[n][m]; // Cambiar el estado del espín
     }
@@ -102,10 +106,11 @@ string format_double(double value) {
 }
 
 // Función para escribir resultados en un archivo
-void escribir_resultados(const string& direccion, double temperaturas[], double medias[], double varianzas[], int n) {
+void escribir_resultados(const string& direccion, double temperaturas[], double magnetizacion[], double error[], double susceptibilidad[], double cumulante[], int n) {
     ofstream salida(direccion);
+    salida << "T  ,  Magnetizacion,  Error,  Susceptibilidad,  Cumulante\n"; // Encabezado del archivo
     for (int i = 0; i < n; i++) {
-        salida << temperaturas[i] << "," << medias[i] << "," << varianzas[i] << "\n";
+        salida << temperaturas[i] << "," << magnetizacion[i] << "," << error[i] << "," << susceptibilidad[i] << "," << cumulante[i] << "\n";
     }
     salida.close();
 }
@@ -133,9 +138,8 @@ int main()
     double H = 0; // Campo magnético externo
     double rm = 0, rm2 = 0, rm4 = 0, rm0 = 0, rm1 = 0, c = 0, tau=0;
 
-    string direccion_magnetizacion = "resultados/H=" + format_double(H) + "/ising_magnetizacion_L_" + to_string(L) + ".dat";
-    string direccion_susceptibilidad = "resultados/H=" + format_double(H) + "/ising_susceptibilidad_L_" + to_string(L) + ".dat";
-    string direccion_momento = "resultados/H=" + format_double(H) + "/ising_momento_L_" + to_string(L) + ".dat";
+    string direccion_resultados = "resultados/H=" + format_double(H) + "/ising_resultados_L_" + to_string(L) + ".dat";
+
     string direccion_energia = "resultados/H=" + format_double(H) + "/ising_energia_L_" + to_string(L) + ".dat";
     ofstream salida_energia(direccion_energia); // Crear archivo para la energía
 
@@ -176,7 +180,7 @@ int main()
         c=0.0;
         tau=0.0;
         for (int i = 0; i < M; i++) {
-            for(int j = 0; j < 10 * L * L; j++) {
+            for(int j = 0; j < 1 * L * L; j++) {
                 ising(s, L, h); // Actualizar el sistema
             }
             rm0 = magnetizacion(s, L); // Magnetización instantánea
@@ -186,7 +190,7 @@ int main()
             c += rm0 * rm1; 
             rm1 = rm0;
 
-            salida_energia << energia_total(s, L, J, H) << "\n"; // Escribir la energía en el archivo
+            //salida_energia << energia_total(s, L, J, H) << "\n"; // Escribir la energía en el archivo
             // escribir_datos(s, L, direccion); // Escribir cada paso de medida
         }
         // escribir_datos(s, L, direccion);
@@ -212,21 +216,8 @@ int main()
     }
 
     // Escribir resultados en los archivos
-    escribir_resultados(direccion_magnetizacion, temperaturas, medias_magnetizacion, errores, n);
+    escribir_resultados(direccion_resultados, temperaturas, medias_magnetizacion, errores, susceptibilidades, momentos, n);
 
-    ofstream salida_susceptibilidad(direccion_susceptibilidad);
-    for (int i = 0; i < n; i++) {
-        salida_susceptibilidad << temperaturas[i] << "," << susceptibilidades[i] << "\n";
-    }
-
-    ofstream salida_momento(direccion_momento);
-    for (int i = 0; i < n; i++) {
-        salida_momento << temperaturas[i] << "," << momentos[i] << "\n";
-    }
-
-
-    salida_susceptibilidad.close();
-    salida_momento.close(); 
 
     salida_energia.close(); // Cerrar el archivo de energía
 

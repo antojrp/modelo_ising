@@ -7,7 +7,7 @@
 #include <algorithm>
 
 // Parámetros del sistema
-const int L = 80;           // Longitud del lado de la red (LxL)
+const int L = 40;           // Longitud del lado de la red (LxL)
 const int N = L * L;        // Número total de espines
 const int M = 8192;         // Número de pasos de medida por temperatura
 const int M0 = 1000;        // Número de pasos de termalización
@@ -74,7 +74,7 @@ int main() {
         s[i] = (ran_u() < 0.5) ? 1 : -1;
 
     // Bucle sobre la temperatura (de 4.0 a 0.1 en pasos de -0.1)
-    for (double T = 4.0; T >= 0.1; T -= 0.1) {
+    for (double T = 2.36; T >= 2.2; T -= 0.01) {
         // Tabla de factores de Boltzmann-Gibbs para ΔE = 2J*s*Σvecinos
         for (int j = -4; j <= 4; j += 2)
             h[j + 4] = std::min(1.0, std::exp(-2.0 * j / T));
