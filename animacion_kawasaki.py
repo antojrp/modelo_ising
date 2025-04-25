@@ -45,10 +45,11 @@ import io
 
 # Parámetros
 # ========================================
-T = 4 # Temperatura del sistema
+
+T = 0.5 # Temperatura del sistema
 L = 100 # Tamaño del retículo (LxL)
-file_in = "resultados/Kawasaki/ising_data_L_" + str(L) + "_T_" + str(T) + ".dat" # Nombre del fichero de datos
-file_out = "resultados/Kawasaki/ising_L_" + str(L) + "_T_" + str(T) # Nombre del fichero de salida (sin extensión)
+file_in = "resultados/Kawasaki/ising_data_L_" + str(L) + "_T_" + str(T) + "_p=0.3.dat" # Nombre del fichero de datos
+file_out = "resultados/Kawasaki/ising_L_" + str(L) + "_T_" + str(T) +"p=0.3" # Nombre del fichero de salida (sin extensión)
 interval = 20 # Tiempo entre fotogramas en milisegundos
 save_to_file = True # False: muestra la animación por pantalla,
                      # True: la guarda en un fichero
@@ -94,7 +95,7 @@ def update(j_frame, frames_data, im):
     im.set_data(frames_data[j_frame])
     
     # Actualiza el título con los valores de L y T
-    ax.set_title(f"L = {L}, T = {T}", fontsize=12)
+    ax.set_title(f"L = {L}, T = {T}, p=0.3", fontsize=12)
 
     return im,
 

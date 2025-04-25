@@ -5,8 +5,8 @@
 # include <cmath>
 
 using namespace std;
-const int L=160; // Tamaño de la red
-const int n=31; // Número de temperaturas
+const int L=200; // Tamaño de la red
+const int n=3; // Número de temperaturas
 const int M0=1; // Número de pasos de termalización
 const int M = 100000; // Número de pasos de medida por temperatura
 
@@ -131,8 +131,8 @@ int main()
     inicializar_aleatorio(); // Inicializar el generador de números aleatorios
 
     int s[L][L];
-    double T_i = 2.26; // Temperatura inicial
-    double T_f = 2.32; // Temperatura final
+    double T_i = 2.33; // Temperatura inicial
+    double T_f = 2.35; // Temperatura final
 
     double J = 1; // Interacción entre espines
     double H = 0; // Campo magnético externo
@@ -180,7 +180,7 @@ int main()
         c=0.0;
         tau=0.0;
         for (int i = 0; i < M; i++) {
-            for(int j = 0; j < 1 * L * L; j++) {
+            for(int j = 0; j < L * L; j++) {
                 ising(s, L, h); // Actualizar el sistema
             }
             rm0 = magnetizacion(s, L); // Magnetización instantánea

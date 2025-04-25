@@ -5,9 +5,9 @@
 # include <math.h>
 
 using namespace std;
-const int L=40; // Tamaño de la red
-const int n=7; // Número de temperaturas
-const int M0=1000; // Número de pasos de termalización
+const int L=100; // Tamaño de la red
+const int n=2; // Número de temperaturas
+const int M0=2000; // Número de pasos de termalización
 const int M = 8192; // Número de pasos de medida por temperatura
 
 
@@ -17,7 +17,7 @@ std::mt19937 rng(time(nullptr)); // Semilla basada en el tiempo
 void generar_datos(int s[L][L], int N)
 {
     std::uniform_real_distribution<double> dist(0.0, 1.0); // Distribución uniforme continua entre 0.0 y 1.0
-    float p = 0.5; // Probabilidad de asignar -1
+    float p = 0.3; // Probabilidad de asignar -1
     for (int j = 0; j < N; j++)
     {
         for (int i = 0; i < N; i++)
@@ -201,12 +201,11 @@ double energia_total(int s[L][L], int L, double J, double H) {
 int main()
 {
     int s[L][L], c[L][L]; // Matriz de espines y matriz de clases
-    double T_i = 0.5; // Temperatura inicial
-    double T_f = 3.5; // Temperatura final
-    double dt, t=0; // Tiempo y delta tiempo
+    double T_i = 0.2; // Temperatura inicial
+    double T_f = 0.5; // Temperatura final
+    double dt, t = 0; // Tiempo y delta tiempo
     double J = 1; // Interacción entre espines
     double H = 0; // Campo magnético externo
-
 
     double temperaturas[n];
     double medias_magnetizacion[n];
@@ -215,15 +214,27 @@ int main()
     generar_datos(s, L);
 
     for (int j = 0; j < n; j++) {
-        t=0; // Reiniciar el tiempo para cada temperatura
+        t = 0; // Reiniciar el tiempo para cada temperatura
         double T = T_f - j * (T_f - T_i) / (n - 1); // Temperatura decreciente
         double h[5][2];
         precalcular_factores(h, J, H, T); // Precalcular factores de Boltzmann-Gibbs
         temperaturas[j] = T;
         generar_datos(s, L);
+
         // Crear un archivo específico para la energía de esta temperatura
-        string direccion_energia = "resultados/Kawasaki/kawasaki_energia_L_" + to_string(L) + "_T_" + format_double(T) + ".dat";
+        string direccion_energia = "resultados/Kawasaki/kawasaki_energia_L_" + to_string(L) + "_T_" + format_double(T) + "_p=0.3.dat";
         ofstream salida_energia(direccion_energia);
+
+        // Crear un archivo para las clases de espines
+        string direccion_clases = "resultados/Kawasaki/kawasaki_clases_L_" + to_string(L) + "_T_" + format_double(T) + "_p=0.3.dat";
+        ofstream salida_clases(direccion_clases);
+
+        // Escribir la cabecera del archivo de clases
+        salida_clases << "Paso";
+        for (int clase = 1; clase <= 10; clase++) {
+            salida_clases << ", Clase " << clase;
+        }
+        salida_clases << "\n";
 
         string direccion = "resultados/Kawasaki/ising_data_L_" + to_string(L) + "_T_" + format_double(T) + ".dat";
         crear_fichero(direccion);
@@ -239,19 +250,32 @@ int main()
 
         // Termalización
         for (int i = 0; i < M0 * L * L; i++) {
-            dt=ising_kawasaki(s, h, c); // Actualizar el sistema
-            // if (static_cast<int>((t) / (L * L)) != static_cast<int>(t / (L * L))) {
+            dt = ising_kawasaki(s, h, c); // Actualizar el sistema
             if (i % (L * L) == 0) { // Cada L^2 pasos
                 double energia = energia_total(s, L, J, H); // Calcular la energía total
-                 // salida_energia << static_cast<int>((t + dt) / (L * L)) << "," << energia << "\n"; // Escribir la energía en el archivo
                 salida_energia << i / (L * L) << "," << energia << "\n"; // Escribir la energía en el archivo
                 escribir_datos(s, L, direccion); // Escribir cada L^2 pasos
-            }
-            t=t+dt; // Actualizar el tiempo
 
+                // Contar cuántos espines hay en cada clase
+                int contador[11] = {0}; // Contador de clases (0 a 10)
+                for (int j = 0; j < L; j++) {
+                    for (int k = 0; k < L; k++) {
+                        contador[c[j][k]]++; // Incrementar el contador de la clase correspondiente
+                    }
+                }
+
+                // Escribir los conteos de clases en el archivo
+                salida_clases << i / (L * L); // Escribir el número de paso
+                for (int clase = 1; clase <= 10; clase++) {
+                    salida_clases << ", " << contador[clase];
+                }
+                salida_clases << "\n";
+            }
+            t = t + dt; // Actualizar el tiempo
         }
 
         salida_energia.close(); // Cerrar el archivo de energía para esta temperatura
+        salida_clases.close();  // Cerrar el archivo de clases para esta temperatura
     }
 
     return 0;
