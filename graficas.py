@@ -5,16 +5,16 @@ import os
 # Tamaños del retículo (LxL)
 L_values = [40, 80, 120, 160, 200]
 # Parámetro crítico del modelo de Ising
-nu = 0.8 
-gamma = 7/4
-beta = 1/8
+nu = 0.89
+gamma = 1.62
+beta = 0.12
 # Obtener el directorio del script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Inicializar listas para almacenar datos de diferentes tamaños
 data = {}
 
-plt.rcParams.update({'font.size': 16})  # Tamaño general de las fuentes
+plt.rcParams.update({'font.size': 19})  # Tamaño general de las fuentes
 
 # Leer los datos para cada tamaño de red
 for L in L_values:
@@ -68,7 +68,7 @@ for L, dataset in data.items():
 plt.axvline(T_c, color="gray", linestyle="--", label="T_c")  # Línea vertical en T_c
 plt.xlabel("Temperatura (T)")
 plt.ylabel("m")
-plt.title("Magnetización frente a Temperatura", fontsize=16)  # Reducir tamaño del título
+plt.title("Magnetización frente a Temperatura", fontsize=19)  # Reducir tamaño del título
 plt.legend()
 plt.grid()
 plt.savefig("resultados/H=0_peque/ising_magnetizacion_vs_T.pdf")
@@ -86,7 +86,7 @@ for L, dataset in data.items():
 plt.axvline(T_c, color="gray", linestyle="--", label="T_c")  # Línea vertical en T_c
 plt.xlabel("Temperatura (T)")
 plt.ylabel("$\chi_T$")
-plt.title("Susceptibilidad frente a Temperatura", fontsize=16)  # Reducir tamaño del título
+plt.title("Susceptibilidad frente a Temperatura", fontsize=19)  # Reducir tamaño del título
 plt.legend()
 plt.grid()
 plt.savefig("resultados/H=0_peque/ising_susceptibilidad_vs_T.pdf")
@@ -104,7 +104,7 @@ for L, dataset in data.items():
 plt.axvline(T_c, color="gray", linestyle="--", label="T_c")  # Línea vertical en T_c
 plt.xlabel("Temperatura (T)")
 plt.ylabel("$U_4$")
-plt.title("Cumulante frente a Temperatura", fontsize=16)  # Reducir tamaño del título
+plt.title("Cumulante frente a Temperatura", fontsize=19)  # Reducir tamaño del título
 plt.legend()
 plt.grid()
 plt.savefig("resultados/H=0_peque/ising_momento_vs_T.pdf")
@@ -121,12 +121,12 @@ for L, dataset in data.items():
         label=f"L = {L}",
         capsize=5,
     )
-plt.xlabel("(1 - T/T_c) * L")
-plt.ylabel("Magnetización promedio")
-plt.title("Magnetización vs (1 - T/T_c) * L", fontsize=16)  # Reducir tamaño del título
+plt.xlabel("(1 - T/T$_c$)L$^{1/\\nu}$")
+plt.ylabel("mL$^{\\beta/\\nu}$")
+plt.title("Magnetización reescalada ($\\nu=0.89, \\beta=0.12$)", fontsize=19)  # Reducir tamaño del título
 plt.legend()
 plt.grid()
-plt.savefig("resultados/H=0_peque/ising_magnetizacion_vs_Tc.pdf")
+plt.savefig("resultados/H=0_peque/ising_magnetizacion_vs_Tc_0.12.pdf")
 plt.show()
 
 # Gráfica de susceptibilidad vs (1 - T/T_c) * L para diferentes tamaños
@@ -138,12 +138,12 @@ for L, dataset in data.items():
         "-o",
         label=f"L = {L}",
     )
-plt.xlabel("(1 - T/T_c) * L")
-plt.ylabel("Susceptibilidad magnética")
-plt.title("Susceptibilidad vs (1 - T/T_c) * L", fontsize=16)  # Reducir tamaño del título
+plt.xlabel("(1 - T/T$_c$)L $^{1/\\nu}$")
+plt.ylabel("$\chi_T$L$^{-(\\gamma/\\nu)}$")
+plt.title("Susceptibilidad reescalada ($\\nu=0.89, \gamma=1.62$)", fontsize=19)  # Reducir tamaño del título
 plt.legend()
 plt.grid()
-plt.savefig("resultados/H=0_peque/ising_susceptibilidad_vs_Tc.pdf")
+plt.savefig("resultados/H=0_peque/ising_susceptibilidad_vs_Tc_1.62.pdf")
 plt.show()
 
 # Gráfica de momento vs (1 - T/T_c) * L para diferentes tamaños
@@ -156,10 +156,10 @@ for L, dataset in data.items():
         label=f"L = {L}",
     )
 plt.xlabel("(1 - T/T$_c$)L$^{1/\\nu}$")
-plt.ylabel("Cumulante cuarto orden")
-plt.title("Cumulante cuarto orden reescalado ($\\nu=0.8$)", fontsize=16)  # Reducir tamaño del título
+plt.ylabel("U$_4$")
+plt.title("Cumulante cuarto orden reescalado ($\\nu=0.89$)", fontsize=19)  # Reducir tamaño del título
 plt.legend()
 plt.grid()
-plt.savefig("resultados/H=0_peque/ising_momento_vs_Tc.pdf")
+plt.savefig("resultados/H=0_peque/ising_momento_vs_Tc_0.89.pdf")
 plt.show()
 
